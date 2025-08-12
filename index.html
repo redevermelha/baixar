@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Baixar Reels em Alta Qualidade</title>
+  <meta name="description" content="Ferramenta simples para baixar Reels em alta qualidade (apenas com permissão do autor)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+          colors: {
+            brand: {
+              50: '#eef9ff', 100: '#d6f0ff', 200: '#aee0ff', 300: '#7bcaff', 400: '#49b1ff', 500: '#1f93ff', 600: '#0f73db', 700: '#0d5ab0', 800: '#0f4c8e', 900: '#103f72'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Pequenos ajustes visuais */
+    html, body { height: 100%; }
+    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,0.85); }
+  </style>
+  <!--
+    AVISO LEGAL IMPORTANTE
+    — Use este site apenas para baixar conteúdos que você próprio publicou ou para os quais você tem autorização expressa do titular.
+    — Respeite os Termos de Uso da plataforma e a legislação de direitos autorais da sua jurisdição.
+    — Este front-end espera um backend que entregue URLs de mídia já autorizadas para download.
+
+    ESPECIFICAÇÃO DO BACKEND (esperado por este front-end)
+    Método: GET /api/reels?url=<URL_DO_REEL>
+    Retorno 200 (application/json):
+    {
+      "title": "string",
+      "thumbnail": "https://…jpg",
+      "author": "string",
+      "duration": 37, // em segundos
+      "formats": [
+        { "quality": "1080p", "url": "https://…mp4", "size": 12345678 },
+        { "quality": "720p",  "url": "https://…mp4", "size": 9876543 }
+      ]
+    }
+    Erro: { "error": "mensagem" }
+
+    EXEMPLO SIMPLES DE BACKEND (Node + Express)
+    // AVISO: Este exemplo não contorna proteções e NÃO acessa APIs privadas.
+    // Ele apenas repassa uma URL de mídia direta que VOCÊ já obteve de forma autorizada.
+    // Instale: npm i express node-fetch@3
+    import express from 'express';
+    import fetch from 'node-fetch';
+    const app = express();
+    app.get('/api/reels', async (req, res) => {
+      const reelUrl = req.query.url?.toString() || '';
+      // Valide a URL e verifique permissões no seu servidor.
+      if (!reelUrl) return res.status(400).json({ error: 'URL obrigatória.' });
+      // Em produção, troque a lógica abaixo por integração com um serviço seu que
+      // gere as URLs de mídia com permissão (ou use um armazenamento próprio).
+      // Aqui vamos apenas retornar dados fictícios para fins de demonstração.
+      return res.json({
+        title: 'Exemplo de Reel',
+        thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop',
+        author: 'autor_exemplo',
+        duration: 37,
+        formats: [
+          { quality: '1080p', url: 'https://file-examples.com/storage/fe9b4c922c9b4f97a8a1ad1/2017/04/file_example_MP4_1920_18MG.mp4', size: 18874368 },
+          { quality: '720p',  url: 'https://file-examples.com/storage/fe9b4c922c9b4f97a8a1ad1/2017/04/file_example_MP4_640_3MG.mp4',  size: 3145728 }
+        ]
+      });
+    });
+    app.listen(3000, () => console.log('API em http://localhost:3000'));
+  -->
+</head>
+<body class="min-h-full bg-gradient-to-br from-brand-50 via-white to-brand-100 text-slate-800">
+  <header class="sticky top-0 z-30 border-b border-slate-200 backdrop-blur bg-white/70">
+    <div class="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-brand-600" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4.5A1.5 1.5 0 0 1 4.5 3h15A1.5 1.5 0 0 1 21 4.5v15A1.5 1.5 0 0 1 19.5 21h-15A1.5 1.5 0 0 1 3 19.5v-15Zm3 1.5v12h12V6H6Zm2 2h8v2H8V8Zm0 4h8v2H8v-2Z"/></svg>
+        <span class="font-semibold">Reels Downloader</span>
+      </div>
+      <nav class="text-sm text-slate-600 hidden sm:block">Baixe apenas com permissão.</nav>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-5xl px-4 py-10">
+    <section class="glass rounded-2xl shadow-xl p-6">
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Baixar Reels em Alta Qualidade</h1>
+      <p class="mt-2 text-slate-600">Cole a URL do Reel abaixo. O arquivo não é armazenado por nós. Use apenas com autorização do titular.</p>
+
+      <form id="form" class="mt-6 grid gap-4 sm:grid-cols-[1fr_auto]" novalidate>
+        <div class="relative">
+          <label for="url" class="sr-only">URL do Reel</label>
+          <input id="url" name="url" type="url" required placeholder="https://www.instagram.com/reel/…" 
+                 class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 pr-28 text-base outline-none focus:ring-4 focus:ring-brand-200" />
+          <div class="absolute inset-y-0 right-2 flex items-center gap-2">
+            <button id="pasteBtn" type="button" class="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50">Colar</button>
+            <button id="clearBtn" type="button" class="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100">Limpar</button>
+          </div>
+        </div>
+        <button id="submitBtn" type="submit" 
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white shadow-lg shadow-brand-600/20 hover:bg-brand-700 focus:outline-none focus:ring-4 focus:ring-brand-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a1 1 0 0 1 1 1v9.586l2.293-2.293a1 1 0 0 1 1.414 1.414l-4.004 4.004a1 1 0 0 1-1.414 0L7.286 12.707a1 1 0 1 1 1.414-1.414L11 13.586V4a1 1 0 0 1 1-1Zm-7 14a1 1 0 1 1 0-2h14a1 1 0 1 1 0 2H5Z"/></svg>
+          Obter links
+        </button>
+      </form>
+
+      <div id="progress" class="mt-4 hidden">
+        <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+          <div id="bar" class="h-2 w-0 bg-brand-500 transition-all"></div>
+        </div>
+        <p id="status" class="mt-2 text-sm text-slate-600">Analisando URL…</p>
+      </div>
+
+      <div id="error" class="mt-4 hidden rounded-xl border border-red-200 bg-red-50 p-3 text-red-700"></div>
+
+      <div id="result" class="mt-6 hidden">
+        <div class="grid gap-4 sm:grid-cols-[180px_1fr]">
+          <img id="thumb" alt="Capa do vídeo" class="aspect-[9/16] w-full max-w-[180px] rounded-xl object-cover shadow" />
+          <div>
+            <h2 id="title" class="text-lg font-semibold"></h2>
+            <p class="text-sm text-slate-600">por <span id="author"></span> • <span id="duration"></span></p>
+            <div class="mt-4 overflow-hidden rounded-xl border border-slate-200">
+              <table class="w-full text-sm">
+                <thead class="bg-slate-50">
+                  <tr>
+                    <th class="px-4 py-2 text-left">Qualidade</th>
+                    <th class="px-4 py-2 text-left">Tamanho</th>
+                    <th class="px-4 py-2"></th>
+                  </tr>
+                </thead>
+                <tbody id="formats" class="divide-y divide-slate-100 bg-white"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="mt-6 text-xs text-slate-500">Dica: se o botão de download abrir em outra aba, clique com o botão direito e escolha “Salvar link como…”</p>
+    </section>
+
+    <section class="mt-8 text-xs text-slate-500">
+      <p>Este projeto não utiliza APIs privadas e não contorna medidas técnicas de proteção. Você é responsável por cumprir a legislação aplicável e os Termos de Uso das plataformas.</p>
+    </section>
+  </main>
+
+  <footer class="mt-12 border-t border-slate-200">
+    <div class="mx-auto max-w-5xl px-4 py-6 text-sm text-slate-600 flex items-center justify-between">
+      <span>© <span id="year"></span> Reels Downloader</span>
+      <a class="hover:underline" href="#" aria-disabled="true">Privacidade</a>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById('form');
+    const input = document.getElementById('url');
+    const progress = document.getElementById('progress');
+    const bar = document.getElementById('bar');
+    const statusEl = document.getElementById('status');
+    const errorEl = document.getElementById('error');
+    const result = document.getElementById('result');
+    const titleEl = document.getElementById('title');
+    const authorEl = document.getElementById('author');
+    const durationEl = document.getElementById('duration');
+    const thumbEl = document.getElementById('thumb');
+    const formatsEl = document.getElementById('formats');
+    const pasteBtn = document.getElementById('pasteBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const isInstagramReel = (url) => {
+      try {
+        const u = new URL(url);
+        return (
+          /instagram\.com$/i.test(u.hostname.replace(/^www\./, '')) &&
+          (u.pathname.startsWith('/reel/') || u.pathname.includes('/reel/'))
+        );
+      } catch { return false; }
+    };
+
+    const formatBytes = (bytes) => {
+      if (!Number.isFinite(bytes)) return '—';
+      const sizes = ['B','KB','MB','GB'];
+      const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), sizes.length - 1);
+      const val = bytes / (1024 ** i);
+      return `${val.toFixed(val < 10 && i > 0 ? 1 : 0)} ${sizes[i]}`;
+    };
+
+    const secondsToHMS = (s) => {
+      s = Math.max(0, Math.floor(s || 0));
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return m ? `${m}m${String(sec).padStart(2,'0')}s` : `${sec}s`;
+    };
+
+    pasteBtn.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) input.value = text.trim();
+      } catch (e) {
+        alert('Não foi possível ler sua área de transferência.');
+      }
+    });
+
+    clearBtn.addEventListener('click', () => { input.value = ''; input.focus(); });
+
+    const setProgress = (p, msg) => {
+      progress.classList.remove('hidden');
+      bar.style.width = `${Math.max(0, Math.min(100, p))}%`;
+      statusEl.textContent = msg || '';
+    };
+
+    const showError = (msg) => {
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+      result.classList.add('hidden');
+      progress.classList.add('hidden');
+    };
+
+    const hideError = () => { errorEl.classList.add('hidden'); };
+
+    async function fetchWithTimeout(resource, options = {}) {
+      const { timeout = 15000 } = options;
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+      try {
+        const response = await fetch(resource, { ...options, signal: controller.signal });
+        return response;
+      } finally { clearTimeout(id); }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideError();
+      const url = input.value.trim();
+      if (!url) return showError('Cole a URL do Reel.');
+      if (!isInstagramReel(url)) return showError('Isso não parece uma URL válida de Reel do Instagram.');
+
+      // Animação de progresso
+      setProgress(20, 'Validando URL…');
+      setTimeout(() => setProgress(45, 'Consultando servidor…'), 300);
+
+      try {
+        // Altere a rota abaixo para o seu backend.
+        const resp = await fetchWithTimeout(`/api/reels?url=${encodeURIComponent(url)}`, { timeout: 20000 });
+        setProgress(65, 'Processando resposta…');
+
+        if (!resp.ok) {
+          const t = await resp.text();
+          throw new Error(t || `Erro ${resp.status}`);
+        }
+        const data = await resp.json();
+        if (!data || !Array.isArray(data.formats) || !data.formats.length) {
+          throw new Error('Nenhuma mídia disponível para download.');
+        }
+
+        // Preencher UI
+        titleEl.textContent = data.title || 'Reel';
+        authorEl.textContent = data.author || 'desconhecido';
+        durationEl.textContent = secondsToHMS(data.duration);
+        thumbEl.src = data.thumbnail || '';
+
+        formatsEl.innerHTML = '';
+        data.formats.forEach((f, idx) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-4 py-2">${f.quality || '—'}</td>
+            <td class="px-4 py-2">${formatBytes(f.size)}</td>
+            <td class="px-4 py-2 text-right">
+              <a href="${f.url}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-50">Download</a>
+            </td>`;
+          formatsEl.appendChild(tr);
+        });
+
+        setProgress(100, 'Pronto!');
+        result.classList.remove('hidden');
+        setTimeout(() => progress.classList.add('hidden'), 800);
+      } catch (err) {
+        console.error(err);
+        // Modo DEMO: se a API falhar, mostramos um exemplo local para demonstrar o fluxo
+        setProgress(80, 'Ativando modo demonstração…');
+        const demo = {
+          title: 'Exemplo de Reel (DEMO)',
+          thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop',
+          author: 'demo_account',
+          duration: 29,
+          formats: [
+            { quality: '1080p', url: 'https://file-examples.com/storage/fe9b4c922c9b4f97a8a1ad1/2017/04/file_example_MP4_1920_18MG.mp4', size: 18874368 },
+            { quality: '720p',  url: 'https://file-examples.com/storage/fe9b4c922c9b4f97a8a1ad1/2017/04/file_example_MP4_640_3MG.mp4',  size: 3145728 }
+          ]
+        };
+        titleEl.textContent = demo.title;
+        authorEl.textContent = demo.author;
+        durationEl.textContent = secondsToHMS(demo.duration);
+        thumbEl.src = demo.thumbnail;
+        formatsEl.innerHTML = '';
+        demo.formats.forEach((f) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-4 py-2">${f.quality}</td>
+            <td class="px-4 py-2">${formatBytes(f.size)}</td>
+            <td class="px-4 py-2 text-right">
+              <a href="${f.url}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-50">Download</a>
+            </td>`;
+          formatsEl.appendChild(tr);
+        });
+        result.classList.remove('hidden');
+        setTimeout(() => progress.classList.add('hidden'), 800);
+        showError('Não foi possível contatar o backend. Exibindo conteúdo de demonstração. Configure sua API em /api/reels.');
+      }
+    });
+  </script>
+</body>
+</html>
